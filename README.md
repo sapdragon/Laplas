@@ -1,3 +1,3 @@
 # Laplas
 Laplas - 6502 CPU Emulator
-Coded from phone, not using ide and 
+Coded from phone, not using ide and PC
