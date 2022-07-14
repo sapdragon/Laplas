@@ -1,2 +1,2 @@
 # Laplas
-Laplas - 6502 Emulator
+Laplas - 6502 CPU Emulator
