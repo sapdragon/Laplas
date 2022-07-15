@@ -1,5 +1,5 @@
 #include "Processor.hpp"
-
+#include "../Utils/Utils.hpp"
 std::vector<uint8_t> C_Processor::GetDataFromMemory( uint16_t nAddress, int iSize )
 {
 	/* Validation */
@@ -46,10 +46,27 @@ uint16_t C_Processor::GetDataFromMnemonic( AddressingMode_t iMode, uint16_t nMne
 		if ( nMnemonic > 256 )
 			throw "Mnemonic > 256";
 		nResult = GetDataFromMemory( nMnemonic ).at( 0 );
-
 		break;
-
-		/*  Other mods soon...*/
+		/* Is absolute addresation, and address = mnemonic + x register */
+		case AbsoluteX:
+		nResult = GetDataFromMemory( nMnemonic + this->m_nIndexXRegister ).at( 0 );
+		break;
+		/* Is absolute addresation, and address = mnemonic + y register */
+		case AbsoluteY:
+		nResult = GetDataFromMemory( nMnemonic + this->m_nIndexXRegister ).at( 0 );
+		break;
+		/* is zero page addresation and address = mnemonic + low bits x register*/
+		case ZeroPageX:
+		uint8_t iZeroMnemonic = nMnemonic;
+		Utils::AddLowBitsToOtherNumber( this->m_nIndexXRegister, iZeroMnemonic );
+		nResult = GetDataFromMemory( iZeroMnemonic ).at( 0 );
+		break;
+		/* is zero page addresation and address = mnemonic + low bits y register*/
+		case ZeroPageY:
+		uint8_t iZeroMnemonic = nMnemonic;
+		Utils::AddLowBitsToOtherNumber( this->m_nIndexYRegister, iZeroMnemonic );
+		nResult = GetDataFromMemory( iZeroMnemonic ).at( 0 );
+		break;
 	}
 	return nResult;
 }
@@ -79,7 +96,26 @@ void C_Processor::SetDataFromMnemonic( AddressingMode_t iMode, uint16_t nMnemoni
 
 		break;
 
-		/*  Other mods soon...*/
+		/* Is absolute addresation, and address = mnemonic + x register */
+		case AbsoluteX:
+		SetDataToMemory( nMnemonic + this->m_nIndexXRegister, vecData );
+		break;
+		/* Is absolute addresation, and address = mnemonic + y register */
+		case AbsoluteY:
+		SetDataToMemory( nMnemonic + this->m_nIndexYRegister, vecData );
+		break;
+		/* is zero page addresation and address = mnemonic + low bits x register*/
+		case ZeroPageX:
+		uint8_t iZeroMnemonic = nMnemonic;
+		Utils::AddLowBitsToOtherNumber( this->m_nIndexXRegister, iZeroMnemonic );
+		SetDataToMemory( iZeroMnemonic, vecData );
+		break;
+		/* is zero page addresation and address = mnemonic + low bits y register*/
+		case ZeroPageY:
+		uint8_t iZeroMnemonic = nMnemonic;
+		Utils::AddLowBitsToOtherNumber( this->m_nIndexYRegister, iZeroMnemonic );
+		SetDataToMemory( iZeroMnemonic, vecData );
+		break;
 	}
 }
 
@@ -148,4 +184,52 @@ void C_Processor::TransferStackPointerToIndexX( )
 void C_Processor::TransferIndexXToStackPointer( )
 {
 	this->m_nStackPointer = this->m_nIndexXRegister;
+}
+
+void C_Processor::AndWithAccumulator( AddressingMode_t iMode, uint16_t nAddress )
+{
+	uint8_t iValue = GetDataFromMnemonic( iMode, nAddress );
+
+	this->m_nAccumulatorRegister &= iValue;
+}
+void C_Processor::XorWithAccumulator( AddressingMode_t iMode, uint16_t nAddress )
+{
+	uint16_t iValue = GetDataFromMnemonic( iMode, nAddress );
+
+	this->m_nAccumulatorRegister |= iValue;
+}
+void C_Processor::OrWithAccumulator( AddressingMode_t iMode, uint16_t nAddress )
+{
+	uint16_t iValue = GetDataFromMnemonic( iMode, nAddress );
+
+	this->m_nAccumulatorRegister ^= iValue;
+}
+
+void C_Processor::IncrementIndexX( )
+{
+	this->m_nIndexXRegister++;
+}
+void C_Processor::DecrementIndexX( )
+{
+	this->m_nIndexXRegister--;
+}
+
+void C_Processor::IncrementIndexY( )
+{
+	this->m_nIndexYRegister++;
+}
+void C_Processor::DecrementIndexY( )
+{
+	this->m_nIndexYRegister--;
+}
+
+void C_Processor::IncrementMemoryByOne( AddressingMode_t iMode, uint16_t nAddress )
+{
+	;
+	/* only one mode*/
+	this->m_aStaticMemory[ nAddress ]++;
+}
+void C_Processor::DecrementMemoryByOne( AddressingMode_t iMode, uint16_t nAddress )
+{
+	this->m_aStaticMemory[ nAddress ]--;
 }

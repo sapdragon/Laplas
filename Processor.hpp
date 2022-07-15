@@ -12,7 +12,7 @@ enum AddressingMode_t
 	AbsoluteX = 6,
 	AbsoluteY = 7,
 	ZeroPageX = 5,
-	ZeroPageY,
+	ZeroPageY = 13,
 	InDirectX = 0,
 	InDirectY = 4,
 	AbsoluteInDirect,
@@ -61,6 +61,21 @@ public:
 
 	void TransferStackPointerToIndexX( );
 	void TransferIndexXToStackPointer( );
+
+	/* Arithmetic bits */
+	void AndWithAccumulator( AddressingMode_t iMode, uint16_t nAddress );
+	void XorWithAccumulator( AddressingMode_t iMode, uint16_t nAddress );
+	void OrWithAccumulator( AddressingMode_t iMode, uint16_t nAddress );
+	/* Increment / Decrement index register*/
+	void IncrementIndexX( );
+	void DecrementIndexX( );
+
+	void IncrementIndexY( );
+	void DecrementIndexY( );
+
+	/* Increment / Decrwment value in memory*/
+	void IncrementMemoryByOne( AddressingMode_t iMode, uint16_t nAddress );
+	void DecrementMemoryByOne( AddressingMode_t iMode, uint16_t nAddress );
 private:
 
 	/* Get the specified number of bytes from memory at the address */
